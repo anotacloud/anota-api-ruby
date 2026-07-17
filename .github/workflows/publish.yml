@@ -1,0 +1,31 @@
+name: Publish to RubyGems
+on:
+  release: { types: [published] }
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for RubyGems API key
+        id: guard
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          if [ -n "$RUBYGEMS_API_KEY" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "RUBYGEMS_API_KEY not configured — skipping publish. Add it in repo Settings > Secrets > Actions to enable."
+          fi
+      - uses: ruby/setup-ruby@v1
+        if: steps.guard.outputs.configured == 'true'
+        with:
+          ruby-version: "3.3"
+      - name: Build and push gem
+        if: steps.guard.outputs.configured == 'true'
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          gem build *.gemspec
+          gem push *.gem

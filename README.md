@@ -23,6 +23,14 @@ Then `bundle install`. Or download a snapshot and put `lib/` on your load path:
 [ZIP](https://github.com/anotacloud/anota-api-ruby/archive/refs/heads/main.zip) ·
 [Tarball](https://github.com/anotacloud/anota-api-ruby/archive/refs/heads/main.tar.gz)
 
+Once the first release is published to RubyGems, you'll also be able to install it directly:
+
+```bash
+gem install anota-api
+```
+
+(Publishing happens automatically on each GitHub release — see [`.github/workflows/publish.yml`](.github/workflows/publish.yml).)
+
 ## Quickstart
 
 ```ruby

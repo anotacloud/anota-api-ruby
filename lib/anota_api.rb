@@ -10,7 +10,7 @@ require "json"
 # returns the server's JSON parsed into plain Ruby Hashes/Arrays; there are no
 # rigid response model classes.
 module AnotaApi
-  VERSION = "1.0.0"
+  VERSION = "2.0.0"
 
   # Raised for any non-2xx response. Carries the HTTP +status+ code and the
   # server's message (the problem-details +detail+, falling back to +title+,
@@ -149,10 +149,18 @@ module AnotaApi
     end
 
     # ----- webhooks -----
+    # Lists a form's webhooks. Each row has id, url, events, enabled, secretHint and secretNote.
+    # The full signing secret is never returned here: secretHint is a masked form
+    # ("whsec_…" + last 4 characters, or just "whsec_…" for short secrets) that identifies
+    # which secret a receiver holds, and secretNote explains the show-once rule. To replace a
+    # lost secret, delete the webhook and add it again.
     def list_webhooks(form_id)
       request("GET", "/forms/#{form_id}/webhooks")
     end
 
+    # Registers a webhook URL that receives submission.created events. The response
+    # (id, formId, url, secret, note) is the ONLY place the full signing secret appears:
+    # store it now, it cannot be read back later (list_webhooks shows only secretHint).
     def add_webhook(form_id, url)
       request("POST", "/forms/#{form_id}/webhooks", body: { url: url })
     end
